@@ -1,0 +1,4 @@
+app/dashboard/.env
+app/dashboard/data/
+app/dashboard/node_modules/
+app/dashboard/npm-debug.log*

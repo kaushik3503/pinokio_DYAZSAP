@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Operations Intelligence Dashboard</title>
+    <link rel="icon" href="/favicon.svg">
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <img src="/favicon.svg" alt="" class="brand-mark">
+          <div>
+            <div class="brand-title">Ops Intelligence</div>
+            <div class="brand-subtitle">Dynatrace + Azure OpenAI</div>
+          </div>
+        </div>
+        <nav class="nav">
+          <a href="#overview" class="nav-item active">Overview</a>
+          <a href="#servers" class="nav-item">Servers</a>
+          <a href="#configuration" class="nav-item">Config</a>
+          <a href="#problems" class="nav-item">Problems</a>
+          <a href="#metrics" class="nav-item">Metrics</a>
+          <a href="#assistant" class="nav-item">AI Analysis</a>
+          <a href="#reports" class="nav-item">Reports</a>
+        </nav>
+        <div class="connection-panel">
+          <div class="connection-row">
+            <span class="dot" id="dynatrace-dot"></span>
+            <span>Dynatrace</span>
+          </div>
+          <div class="connection-row">
+            <span class="dot" id="azure-dot"></span>
+            <span>Azure OpenAI</span>
+          </div>
+          <div class="connection-row">
+            <span class="dot" id="email-dot"></span>
+            <span>Email</span>
+          </div>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <canvas id="flow-canvas" class="flow-canvas" aria-hidden="true"></canvas>
+          <div class="topbar-copy">
+            <h1>Operations Intelligence Dashboard</h1>
+            <p id="last-updated">Waiting for data</p>
+          </div>
+          <div class="actions timeline-actions">
+            <div class="timeline-controls">
+              <select id="time-range" aria-label="Time range">
+                <option value="now-30m">Last 30 minutes</option>
+                <option value="now-2h" selected>Last 2 hours</option>
+                <option value="now-6h">Last 6 hours</option>
+                <option value="now-12h">Last 12 hours</option>
+                <option value="now-24h">Last 24 hours</option>
+                <option value="now-7d">Last 7 days</option>
+                <option value="now-14d">Last 14 days</option>
+                <option value="now-30d">Last 30 days</option>
+                <option value="custom">Custom range</option>
+              </select>
+              <div id="custom-range" class="custom-range hidden">
+                <label>
+                  <span>Start</span>
+                  <input id="custom-from" type="datetime-local">
+                </label>
+                <label>
+                  <span>End</span>
+                  <input id="custom-to" type="datetime-local">
+                </label>
+              </div>
+            </div>
+            <button id="refresh-btn" class="primary-btn" type="button">Refresh</button>
+          </div>
+        </header>
+
+        <section id="overview" class="section">
+          <div class="kpi-grid">
+            <article class="kpi">
+              <span class="kpi-label">Posture</span>
+              <strong id="kpi-posture">--</strong>
+              <small>Current operating state</small>
+            </article>
+            <article class="kpi">
+              <span class="kpi-label">Open Problems</span>
+              <strong id="kpi-open">--</strong>
+              <small>Dynatrace problem feed</small>
+            </article>
+            <article class="kpi">
+              <span class="kpi-label">Critical Signals</span>
+              <strong id="kpi-critical">--</strong>
+              <small>Error, availability, resource contention</small>
+            </article>
+            <article class="kpi">
+              <span class="kpi-label">Impacted Entities</span>
+              <strong id="kpi-impacted">--</strong>
+              <small>Services, apps, and infrastructure</small>
+            </article>
+          </div>
+        </section>
+
+        <section id="servers" class="section servers-page">
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <h2>Monitored Servers</h2>
+                <p id="servers-status">No servers loaded</p>
+              </div>
+              <button id="new-server-btn" class="secondary-btn" type="button">New Server</button>
+            </div>
+            <div class="server-summary" id="server-summary"></div>
+            <div class="server-list" id="server-list"></div>
+          </div>
+
+          <form id="monitor-server-form" class="panel">
+            <div class="panel-header">
+              <div>
+                <h2>Server Monitoring Profile</h2>
+                <p id="monitor-server-status">Create or edit a monitored server</p>
+              </div>
+              <label class="toggle">
+                <input id="monitor-server-active" type="checkbox">
+                <span class="toggle-track"></span>
+                <span id="monitor-server-active-label">Inactive</span>
+              </label>
+            </div>
+            <input id="monitor-server-id" type="hidden">
+            <div class="form-grid">
+              <label>
+                <span>Server name</span>
+                <input id="monitor-server-name" type="text" autocomplete="off">
+              </label>
+              <label>
+                <span>Environment</span>
+                <input id="monitor-server-environment" type="text" autocomplete="off">
+              </label>
+              <label>
+                <span>Host / URL</span>
+                <input id="monitor-server-host" type="text" autocomplete="off">
+              </label>
+              <label>
+                <span>Dynatrace host entity ID</span>
+                <input id="monitor-server-entity" type="text" autocomplete="off" placeholder="HOST-XXXXXXXXXXXXXXX">
+              </label>
+              <label>
+                <span>OS</span>
+                <input id="monitor-server-os" type="text" autocomplete="off">
+              </label>
+              <label>
+                <span>Owner</span>
+                <input id="monitor-server-owner" type="text" autocomplete="off">
+              </label>
+              <label>
+                <span>Management zone</span>
+                <input id="monitor-server-zone" type="text" autocomplete="off">
+              </label>
+              <label>
+                <span>Tags</span>
+                <input id="monitor-server-tags" type="text" autocomplete="off" placeholder="checkout, linux, production">
+              </label>
+              <label class="span-2">
+                <span>Problem selector override</span>
+                <input id="monitor-server-problem-selector" type="text" autocomplete="off">
+              </label>
+              <label class="span-2">
+                <span>Inode metric selector</span>
+                <input id="monitor-server-inode-metric" type="text" autocomplete="off">
+              </label>
+              <label>
+                <span>Inode warning %</span>
+                <input id="monitor-server-inode-warning" type="number" min="1" max="100" step="1">
+              </label>
+              <label>
+                <span>Inode critical %</span>
+                <input id="monitor-server-inode-critical" type="number" min="1" max="100" step="1">
+              </label>
+              <label class="checkbox-line">
+                <input id="monitor-server-inode-enabled" type="checkbox">
+                <span>Check inode usage</span>
+              </label>
+              <label class="span-2">
+                <span>Server notes</span>
+                <textarea id="monitor-server-details" rows="4"></textarea>
+              </label>
+            </div>
+            <div class="button-row">
+              <button id="save-monitor-server-btn" class="primary-btn" type="submit">Save Server</button>
+              <button id="delete-monitor-server-btn" class="secondary-btn" type="button">Remove</button>
+            </div>
+          </form>
+
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <h2>Inode Details</h2>
+                <p id="inode-status">Select a server and run an inode check</p>
+              </div>
+              <button id="check-inodes-btn" class="primary-btn" type="button">Check Inodes</button>
+            </div>
+            <select id="server-select" aria-label="Server for inode check"></select>
+            <div class="inode-details" id="inode-details"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <h2>Ask About This Server</h2>
+                <p>Azure OpenAI answers using Dynatrace problems, metrics, and inode context</p>
+              </div>
+              <button id="ask-server-btn" class="primary-btn" type="button">Ask</button>
+            </div>
+            <textarea id="server-question" rows="4">Explain the current inode risk, likely causes, and the next checks for this server.</textarea>
+            <pre id="server-ai-output">Ask a natural-language question about the selected server.</pre>
+          </div>
+        </section>
+
+        <section id="configuration" class="section">
+          <form id="config-form" class="panel">
+            <div class="panel-header">
+              <div>
+                <h2>Server Details</h2>
+                <p id="config-status">Not saved</p>
+              </div>
+              <label class="toggle">
+                <input id="server-active" type="checkbox">
+                <span class="toggle-track"></span>
+                <span id="server-active-label">Inactive</span>
+              </label>
+            </div>
+
+            <div class="form-grid">
+              <label>
+                <span>Server name</span>
+                <input id="server-name" type="text" autocomplete="off">
+              </label>
+              <label>
+                <span>Environment</span>
+                <input id="server-environment" type="text" autocomplete="off">
+              </label>
+              <label>
+                <span>Host / URL</span>
+                <input id="server-host" type="text" autocomplete="off">
+              </label>
+              <label>
+                <span>Owner</span>
+                <input id="server-owner" type="text" autocomplete="off">
+              </label>
+              <label class="span-2">
+                <span>Server details</span>
+                <textarea id="server-details" rows="4"></textarea>
+              </label>
+              <label class="span-2">
+                <span>Distribution lists</span>
+                <textarea id="recipient-dls" rows="3"></textarea>
+              </label>
+              <label class="span-2">
+                <span>Individual email IDs</span>
+                <textarea id="recipient-individuals" rows="3"></textarea>
+              </label>
+              <label>
+                <span>Report subject prefix</span>
+                <input id="report-prefix" type="text" autocomplete="off">
+              </label>
+              <label class="checkbox-line">
+                <input id="report-include-ai" type="checkbox">
+                <span>Use Azure OpenAI enrichment</span>
+              </label>
+            </div>
+
+            <div class="button-row">
+              <button id="save-config-btn" class="primary-btn" type="submit">Save Details</button>
+            </div>
+          </form>
+        </section>
+
+        <section id="problems" class="section split">
+          <div class="panel wide">
+            <div class="panel-header">
+              <div>
+                <h2>Problem Feed</h2>
+                <p id="problem-count">No problems loaded</p>
+              </div>
+              <span class="mode-pill" id="data-mode">Demo</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Problem</th>
+                    <th>Severity</th>
+                    <th>Impact</th>
+                    <th>Root Cause</th>
+                    <th>Duration</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="problem-table"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="metrics" class="section">
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <h2>Metric Signals</h2>
+                <p>Folded Dynatrace metric values for the selected time range</p>
+              </div>
+            </div>
+            <div class="trend-chart" id="trend-chart" role="img" aria-label="Metric trend graph"></div>
+            <div class="metric-insight-strip" id="metric-insight-strip"></div>
+            <div class="metric-grid" id="metric-grid"></div>
+            <div class="metric-detail-table" id="metric-detail-table"></div>
+          </div>
+        </section>
+
+        <section id="assistant" class="section assistant-layout">
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <h2>AI Analysis</h2>
+                <p>Incident summary generated from the current dashboard context</p>
+              </div>
+            </div>
+            <textarea id="question" rows="4">Summarize the current risk, likely root cause, and the next three actions for the on-call engineer.</textarea>
+            <button id="analyze-btn" class="primary-btn" type="button">Analyze</button>
+            <pre id="analysis-output">Run analysis to generate an SRE summary.</pre>
+          </div>
+
+          <div class="panel compact">
+            <h2>Runtime Inputs</h2>
+            <dl class="config-list">
+              <dt>Dynatrace scopes</dt>
+              <dd>problems.read, metrics.read</dd>
+              <dt>Azure model</dt>
+              <dd id="azure-model">Not configured</dd>
+              <dt>Backend</dt>
+              <dd>Node local HTTP server</dd>
+            </dl>
+          </div>
+        </section>
+
+        <section id="reports" class="section assistant-layout">
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <h2>Performance Report</h2>
+                <p id="report-status">No report generated</p>
+              </div>
+            </div>
+            <div class="button-row">
+              <button id="generate-report-btn" class="primary-btn" type="button">Generate Report</button>
+              <button id="send-report-btn" class="secondary-btn" type="button">Send Email</button>
+            </div>
+            <pre id="report-output">Report output will appear here.</pre>
+          </div>
+
+          <div class="panel compact">
+            <h2>Email Delivery</h2>
+            <dl class="config-list">
+              <dt>SMTP</dt>
+              <dd id="smtp-state">Not configured</dd>
+              <dt>Recipients</dt>
+              <dd id="recipient-summary">None</dd>
+              <dt>Server status</dt>
+              <dd id="server-status-summary">Inactive</dd>
+            </dl>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script src="/app.js"></script>
+  </body>
+</html>

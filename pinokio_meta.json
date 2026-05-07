@@ -1,0 +1,16 @@
+{
+  "posts": [],
+  "links": [{
+    "title": "References",
+    "links": [{
+      "title": "Dynatrace Problems API v2",
+      "value": "https://docs.dynatrace.com/docs/dynatrace-api/environment-api/problems-v2"
+    }, {
+      "title": "Dynatrace Metrics API v2",
+      "value": "https://docs.dynatrace.com/docs/dynatrace-api/environment-api/metric-v2"
+    }, {
+      "title": "Azure OpenAI REST API",
+      "value": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest"
+    }]
+  }]
+}

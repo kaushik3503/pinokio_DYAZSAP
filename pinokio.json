@@ -1,0 +1,5 @@
+{
+  "title": "Ops Intelligence Dashboard",
+  "description": "Local dashboard for Dynatrace problems and metrics with Azure OpenAI incident analysis.",
+  "icon": "app/dashboard/public/favicon.svg"
+}

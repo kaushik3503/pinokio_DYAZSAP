@@ -1,0 +1,14 @@
+{
+  "name": "dynatrace-azure-openai-dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local Dynatrace dashboard with Azure OpenAI incident analysis.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT"
+}

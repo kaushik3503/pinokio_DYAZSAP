@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ops Intelligence Dashboard</title>
+    <style>
+      :root {
+        --bg: #eef3f4;
+        --surface: #ffffff;
+        --text: #162126;
+        --muted: #657783;
+        --line: #d7e1e5;
+        --brand: #0b766d;
+        --brand-dark: #07544e;
+        --accent: #c56c11;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(180deg, #f8fbfc 0%, var(--bg) 100%);
+        color: var(--text);
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      main {
+        width: min(760px, calc(100vw - 36px));
+        padding: 32px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        box-shadow: 0 1px 2px rgba(15, 35, 45, 0.06), 0 18px 48px rgba(15, 35, 45, 0.09);
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        min-height: 28px;
+        align-items: center;
+        padding: 0 10px;
+        border-radius: 999px;
+        background: #e0f5f1;
+        color: var(--brand-dark);
+        font-size: 12px;
+        font-weight: 850;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 18px 0 12px;
+        font-size: 32px;
+        line-height: 1.15;
+      }
+
+      p {
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 22px;
+      }
+
+      a {
+        min-height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 16px;
+        border-radius: 6px;
+        color: var(--brand-dark);
+        border: 1px solid var(--line);
+        font-weight: 850;
+        text-decoration: none;
+      }
+
+      a.primary {
+        background: var(--brand);
+        border-color: var(--brand);
+        color: #ffffff;
+      }
+
+      a:hover {
+        background: #f3f6f7;
+      }
+
+      a.primary:hover {
+        background: var(--brand-dark);
+      }
+
+      code {
+        color: #33444d;
+        background: #f3f6f7;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 2px 6px;
+      }
+
+      @media (max-width: 560px) {
+        main {
+          padding: 24px;
+        }
+
+        h1 {
+          font-size: 28px;
+        }
+
+        a {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <span class="eyebrow">Local operations console</span>
+      <h1>Ops Intelligence Dashboard</h1>
+      <p>Start the backend from the Pinokio sidebar, then open the generated Web UI URL. The dashboard connects to Dynatrace through the local backend and can use Azure OpenAI for incident analysis.</p>
+      <p>Configuration lives in <code>app/dashboard/.env</code>.</p>
+      <div class="actions">
+        <a class="primary" href="README.md">Setup Guide</a>
+        <a href="app/dashboard">Dashboard Files</a>
+      </div>
+    </main>
+  </body>
+</html>
